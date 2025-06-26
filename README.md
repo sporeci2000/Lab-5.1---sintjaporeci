@@ -1,0 +1,15 @@
+1. How did you dynamically create and append new elements to the DOM?  
+
+To add new items to the cart, I first created a new list item using document.createElement('li'). Then I used template literals to build the HTML content and set it with innerHTML - this was really helpful because I could include all the product details like name, price, and quantity in one go. I made sure to save each item's total price in dataset.price so I could use it later for calculations. After that, I added the new item to the cart using appendChild() and attached event listeners to both the quantity input and remove button so users could actually interact with them..
+
+2. What steps did you take to ensure accurate updates to the total price?
+
+I decided to create one main function called updateTotalPrice() to handle all the price changes - this way I wouldn't mess up the calculations by doing them differently in different places. When someone adds a new item, I just pass the item's total as a positive number. When they remove something, I pass the price as a negative number to subtract it. The trickiest part was updating quantities - instead of recalculating everything, I figured out the difference between the old price and new price and just applied that change. I also used toFixed(2) everywhere to make sure prices always show two decimal places and stored all the prices in data attributes so I could grab them when needed.
+
+3. How did you handle invalid input for product name or price?
+
+I set up validation to catch different types of bad input before they could break anything. I used trim() on the product name to get rid of any extra spaces, and parseFloat() and parseInt() to convert the price and quantity to numbers. Then I created one big if statement that checks for empty names, prices that aren't numbers or are zero/negative, and quantities that are invalid. If any of these problems exist, the user gets an alert telling them to fix their input, and the function stops running with return. For quantity changes though, I decided to just automatically fix invalid numbers by setting them to 1 - this felt smoother than showing error messages every time.
+
+4. What challenges did you face when implementing the remove functionality?
+
+The remove feature was probably the hardest part! The biggest issue was that when someone clicks the remove button, the event.target points to the button itself, not the whole cart item I needed to delete. I had to use event.target.closest('li') to find the parent list item. Another problem was getting the right price to subtract from the total - I needed the full item price (not just the unit price), so I had to pull that from the dataset.price I stored earlier. Making sure the math worked out correctly was tricky too - I had to subtract the exact amount using negative values. And since I was creating the remove buttons dynamically, I couldn't just set up one event listener at the beginning - I had to add a new listener to each button right after creating each cart item.
