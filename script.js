@@ -1,6 +1,6 @@
 const productNameInput = document.getElementById('product-name');
 const productPriceInput = document.getElementById('product-price');
-const productQuantityInput  = document.getElementById('product-quantity');
+const productQuantityInput = document.getElementById('product-quantity');
 const addProductButton = document.getElementById('add-product');
 const cart = document.getElementById('cart');
 const totalPriceSpan = document.getElementById('total-price');
@@ -21,56 +21,53 @@ function removeItem(event) {
     item.remove();
 }
 
+//Function to add products to cart
+function addProductsToCart() {
+    const productName = productNameInput.value.trim();
+    const productPrice = parseFloat(productPriceInput.value);
+    const productQuantity = parseInt(productQuantityInput.value);
 
-addProductButton.addEventListener("click", () => {
-    const name = productNameInput.value.trim();
-    const price = parseFloat(productPriceInput.value);
-    let quantity = parseInt(productQuantityInput.value);
-
-    if (!name || isNaN(price) || price <= 0 || isNaN(quantity) || quantity < 1) {
-        alert('Please check your product details!');
+    //Validate product details
+    if (productName === '') {
+        alert('Please enter a product name!');
         return;
     }
 
-    const item = document.createElement('li');
-    const totalItemPrice = price * quantity;
+    if (productPriceInput.value === '' || productPrice <= 0) {
+        alert('Please enter a price greater than 0!');
+        return;
+    }
 
+    if (productQuantityInput.value === '' || productQuantity < 1) {
+        alert('Please enter a quantity of at least 1!');
+        return;
+    }
 
-    item.dataset.price = totalItemPrice;
-    item.innerHTML = `
-        <strong>${name}</strong> - $${price.toFixed(2)} x 
-        <input type="number" value="${quantity}" min="1" class="quantity-input"> = 
-        $<span class="item-total">${totalItemPrice.toFixed(2)}</span>
-        <button class="remove-button">Remove</button>
+    const productsTotalPrice = productPrice * productQuantity;
+
+    const newProduct = document.createElement('li');
+    newProduct.classList.add('cart-item');
+    newProduct.dataset.price = productsTotalPrice;
+
+    newProduct.innerHTML = `
+    <span>${productName}:  $${productPrice.toFixed(2)} × ${productQuantity} = $${productsTotalPrice.toFixed(2)}</span>
+    <button class="remove"> Remove </button>
     `;
 
-    cart.appendChild(item);
-    updateTotalPrice(totalItemPrice);
 
+    const removeButton = newProduct.querySelector('.remove');
+    removeButton.addEventListener('click', removeItem);
+
+    cart.appendChild(newProduct);
+
+    updateTotalPrice(productsTotalPrice);
+
+    //Clear input fields
     productNameInput.value = '';
     productPriceInput.value = '';
     productQuantityInput.value = '';
 
-    const quantityInput = item.querySelector('.quantity-input');
-    quantityInput.addEventListener('change', (e) => updateQuantity(e, price, item));
-
-    const removeButton = item.querySelector('.remove-button');
-    removeButton.addEventListener('click', removeItem);
-});
-
-
-function updateQuantity(changeEvent, unitPrice, cartItemElement) {
-    let updatedQuantity = parseInt(changeEvent.target.value);
-    if (isNaN(updatedQuantity) || updatedQuantity < 1) {
-        updatedQuantity = 1;
-        changeEvent.target.value = 1;
-    }
-
-    const previousItemTotal = parseFloat(cartItemElement.dataset.price);
-    const calculatedItemTotal = unitPrice * updatedQuantity;
-
-    cartItemElement.dataset.price = calculatedItemTotal;
-    cartItemElement.querySelector('.item-total').textContent = calculatedItemTotal.toFixed(2);
-
-    updateTotalPrice(calculatedItemTotal - previousItemTotal);
 }
+
+
+addProductButton.addEventListener('click', addProductsToCart);
